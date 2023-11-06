@@ -1,0 +1,144 @@
+def register_name(name):
+    name = input(f"Введите имя для {name}: ")
+    name = name.capitalize()
+    return name
+
+def register_symb(symb, name):
+    symb = input(f"Введите символ для {name}: ")
+    symb = symb.capitalize()
+    return symb
+
+def register_players(pl_x, pl_o, symb_x, symb_o):
+    player_x = register_name(pl_x)
+    symbol_x = register_symb(symb_x, player_x)
+    player_o = register_name(pl_o)
+    symbol_o = register_symb(symb_o, player_o)
+    pl_dict = {f"{player_x}": f"{symbol_x}", f"{player_o}": f"{symbol_o}"}
+    return pl_dict
+
+def draw_pg(playground, pl_x, pl_o, symb_x, symb_o):
+    name_player_x = pl_x
+    name_player_o = pl_o
+    symb_player_x = symb_x
+    symb_player_o = symb_o
+    print("")
+    print(f"{name_player_x} - [{symb_player_x}]_VS_[{symb_player_o}] - {name_player_o}")
+    print("x\y | y1  | y2  | y3  |")
+    print("-" * 23)
+    for i in range(3):
+        print(f"x{i+1}", " | ", playground[0+i*3], " | ", playground[1+i*3], " | ", playground[2+i*3], " |")
+        print("-" * 23)
+    print("")
+
+def take_input(player_token, pl_dict, playground):
+    valid = False
+    while not valid:
+        current_player = "".join([key for key, value in pl_dict.items() if value == player_token])
+        player_answer = input(f"{current_player}, куда поставим {player_token}? ")
+        try:
+           player_answer = int(player_answer)
+        except:
+           print("Некорректный ввод. Вы уверены, что ввели число?")
+           continue
+        if player_answer >= 1 and player_answer <= 9:
+            if(str(playground[player_answer-1]) not in pl_dict.values()):
+                playground[player_answer-1] = player_token
+                valid = True
+            else:
+                print("Эта клетка уже занята!")
+        else:
+           print("Некорректный ввод. Введите число от 1 до 9.")
+
+def check_win(playground):
+    win_coord = ((0,1,2), (3,4,5), (6,7,8), (0,3,6), (1,4,7), (2,5,8), (0,4,8), (2,4,6))
+    for each in win_coord:
+        if playground[each[0]] == playground[each[1]] == playground[each[2]] and playground[each[0]] != "-":
+            return playground[each[0]]
+    return False
+
+def change_player(pl_dict):
+    players = list(pl_dict.keys())
+    player_x = players[0]
+    player_o = players[1]
+    symbol_x = f"{pl_dict[player_x]}"
+    symbol_o = f"{pl_dict[player_o]}"
+    change_player = input(f"Продолжаем как {player_x} и {player_o}? Y/N? ")
+    if change_player == "N" or change_player == "n" or change_player == "0":
+        pl_dict = register_players(player_x, player_o, symbol_x, symbol_o)
+    return pl_dict
+
+def next_play():
+    next_play = input("Сыграем еще? [Y/y/1]/[N/n/0]? ")
+    if next_play == "Y" or next_play == "y" or next_play == "1":
+        return True
+    else:
+        print("Удачи на дорогах, *ПУФ*")
+        return False
+
+def game(pl_dict):
+    players = list(pl_dict.keys())
+    player_x = players[0]
+    player_o = players[1]
+    symbol_x = f"{pl_dict[player_x]}"
+    symbol_o = f"{pl_dict[player_o]}"
+    playground = list('-' * 9)
+    step_counter = 0
+    print(f"Право первого хода: Игрок_1")
+    win = False
+    while not win:
+        draw_pg(playground, player_x, player_o, symbol_x, symbol_o)
+        if step_counter % 2 == 0:
+            take_input(symbol_x, pl_dict, playground)
+        else:
+            take_input(symbol_o, pl_dict, playground)
+        step_counter += 1
+        if step_counter > 4:
+            win_simbol = check_win(playground)
+            if win_simbol:
+                win_name = [key for key, value in pl_dict.items() if value == win_simbol]
+                print(f"Принимайте поздравления, {win_name[0]}, вы победили! Так держать!")
+                win = True
+                draw_pg(playground, player_x, player_o, symbol_x, symbol_o)
+                return players
+        if step_counter == 9:
+            print("Ничья!")
+            return players
+
+def main():
+    standart_pl_x = "Игрок_1"
+    standart_pl_o = "Игрок_2"
+    standart_symb_x = "X"
+    standart_symb_o = "O"
+    game_counter = 0
+    pl_dict = {}
+    print("""
+    Приветствую вас впервые, небольшо предисловие..
+    Отвечать на вопросы прошу символами [Y/y/1]/[N/n/0]
+    Ходы совершаются по введению цифры range(1:10)
+                x\y | y1  | y2  | y3  |
+                -----------------------
+                x1  |  1  |  2  |  3  |
+                -----------------------
+                x2  |  4  |  5  |  6  |
+                -----------------------
+                x3  |  7  |  8  |  9  |
+                -----------------------
+    """)
+    reg_yn = input("Будем играть анонимно и по класике? Y=1/N=0... ")
+    if reg_yn == "Y" or reg_yn == "y" or reg_yn == "1":
+        print("Удачи дорогие гости!")
+        pl_dict = {f"{standart_pl_x}": f"{standart_symb_x}", f"{standart_pl_o}": f"{standart_symb_o}"}
+        game(pl_dict)
+    elif reg_yn == "N" or reg_yn == "n" or reg_yn == "0":
+        print("Добро пожаловать в крестики нолики! пару вопросов..")
+        pl_dict = register_players(standart_pl_x, standart_pl_o, standart_symb_x, standart_symb_o)
+        game(pl_dict)
+    else:
+        print("Всего хорошего!")
+    while True:
+        if not next_play():
+            break
+        pl_dict = change_player(pl_dict)
+        game(pl_dict)
+
+main()
