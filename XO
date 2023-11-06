@@ -12,17 +12,19 @@ def register_players(pl_x, pl_o, symb_x, symb_o):
     player_x = register_name(pl_x)
     symbol_x = register_symb(symb_x, player_x)
     player_o = register_name(pl_o)
+    if player_o == player_x:
+        while player_o == player_x:
+            player_o = register_name(pl_o)
     symbol_o = register_symb(symb_o, player_o)
+    if symbol_o == symbol_x:
+        while symbol_o == symbol_x:
+            symbol_o = register_symb(symb_o, player_o)
     pl_dict = {f"{player_x}": f"{symbol_x}", f"{player_o}": f"{symbol_o}"}
     return pl_dict
 
 def draw_pg(playground, pl_x, pl_o, symb_x, symb_o):
-    name_player_x = pl_x
-    name_player_o = pl_o
-    symb_player_x = symb_x
-    symb_player_o = symb_o
     print("")
-    print(f"{name_player_x} - [{symb_player_x}]_VS_[{symb_player_o}] - {name_player_o}")
+    print(f"{pl_x} - [{symb_x}]_VS_[{symb_o}] - {pl_o}")
     print("x\y | y1  | y2  | y3  |")
     print("-" * 23)
     for i in range(3):
@@ -83,7 +85,7 @@ def game(pl_dict):
     symbol_o = f"{pl_dict[player_o]}"
     playground = list('-' * 9)
     step_counter = 0
-    print(f"Право первого хода: Игрок_1")
+    print("Да начнется игра!")
     win = False
     while not win:
         draw_pg(playground, player_x, player_o, symbol_x, symbol_o)
